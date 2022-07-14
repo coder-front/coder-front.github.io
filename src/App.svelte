@@ -1,20 +1,34 @@
 <script>
+	
+	import { onMount } from 'svelte'
 
-	import { Router, Route, Link } from 'svelte-navigator';
+	import { page } from './stores/page'
 
-	import Home from './views/Home.svelte';
-	import MainLayout from './views/MainLayout.svelte';
+	import MainLayout from './views/MainLayout.svelte'
+	import Home from './views/Home.svelte'
+	import NotFound from './views/NotFound.svelte'
+
+	const routingMap = {
+		'#main-layout': MainLayout
+	}
+
+	function routeChange() {
+		if (location.hash === '' && location.pathname === '/') {
+			page.set(Home)
+		} else {
+			page.set(routingMap[location.hash] || NotFound)
+		}
+	}
+
+	onMount(() => {
+		routeChange()
+	})
 
 </script>
 
 
-<Router>
-	<nav>
-		<Link to="/">Home</Link>
-		<Link to="main-layout">Main Layout</Link>
-	</nav>
-	<div>
-		<Route path="/" component={Home} />
-		<Route path="/main-layout" component={MainLayout} />
-	</div>
-</Router>
+<svelte:window on:hashchange={routeChange} />
+
+<section>
+	<svelte:component this={$page} />
+</section>
